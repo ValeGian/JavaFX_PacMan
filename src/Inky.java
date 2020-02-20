@@ -28,17 +28,25 @@ class Inky extends Ghost{
         if(returnHome)  //if going back home, sets the target to home
             ghostNodes.add(new GraphNode(gameBoard, 15*TILE_SIZE, 11*TILE_SIZE));
         else{
-            if(chase){  //IT'S TARGET IR RELATIVE TO BLINKY'S POSITION
-                Vect2D target = new Vect2D(2*gameBoard.pacman.pos.x/TILE_SIZE - gameBoard.blinky.pos.y/TILE_SIZE, 2*gameBoard.pacman.pos.x/TILE_SIZE - gameBoard.blinky.pos.y/TILE_SIZE);
-                Vect2D nearestTile = gameBoard.getNearestNonWallTile(target);
+            if(chase){  //TARGET 4 POSITIONS BEHIND PACMAN
+                int loohBehind = 4;
+                Vect2D pacmanMatrixPosBehind = new Vect2D(gameBoard.pacman.pos.x/TILE_SIZE - gameBoard.pacman.vel.x*loohBehind, gameBoard.pacman.pos.y/TILE_SIZE - gameBoard.pacman.vel.y*loohBehind);
                 
-                if(Vect2D.dist(this.pos, nearestTile) < 1*TILE_SIZE)
+                while(!(pacmanMatrixPosBehind.x > 2 && pacmanMatrixPosBehind.y > 0
+                        && pacmanMatrixPosBehind.x < 30 && pacmanMatrixPosBehind.y < 31
+                        && gameBoard.tiles[pacmanMatrixPosBehind.y][pacmanMatrixPosBehind.x].getTileType() != BoardTile.WALL)){
+                    
+                    loohBehind -= 1;
+                    pacmanMatrixPosBehind = new Vect2D(gameBoard.pacman.pos.x/TILE_SIZE - gameBoard.pacman.vel.x*loohBehind, gameBoard.pacman.pos.y/TILE_SIZE - gameBoard.pacman.vel.y*loohBehind);
+                }
+                
+                if(Vect2D.dist(this.pos, pacmanMatrixPosBehind) < 1*TILE_SIZE)
                     ghostNodes.add(new GraphNode(gameBoard, gameBoard.pacman.pos));
                 else
-                    ghostNodes.add(new GraphNode(gameBoard, nearestTile.x*TILE_SIZE, nearestTile.y*TILE_SIZE));
+                    ghostNodes.add(new GraphNode(gameBoard, pacmanMatrixPosBehind.x*TILE_SIZE, pacmanMatrixPosBehind.y*TILE_SIZE));
             }
             else
-                ghostNodes.add(new GraphNode(gameBoard, 28*TILE_SIZE, 29*TILE_SIZE));
+                ghostNodes.add(new GraphNode(gameBoard, 28*TILE_SIZE, 1*TILE_SIZE));
         }
         
         connectMapNodes();
